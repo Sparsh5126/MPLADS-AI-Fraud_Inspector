@@ -1,9 +1,8 @@
 # MPLADS AI Fraud & Anomaly Detection — Prototype
 
 ## How to run it (in order)
-1. `python3 data_generator.py`   -> generates data/*.csv (synthetic MPLADS dataset + hidden ground_truth.csv)
-2. `python3 risk_scoring.py`     -> runs all 7 detectors, writes output/risk_report.csv
-3. `python3 evaluate.py`         -> grades the system against the hidden ground truth (precision/recall)
+1. `python3 risk_scoring.py`     -> runs all 7 detectors, writes output/risk_report.csv
+2. `python3 evaluate.py`         -> grades the system against the hidden ground truth (precision/recall)
 
 ## File map
 - `data_generator.py`            Synthetic data + injected fraud patterns (heavily commented -- read the module

@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #F7F9FC;
+    color: #111827;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :root {
+    --sidebar-width: 240px;
+    --header-height: 64px;
+    --color-critical: #EF4444;
+    --color-high: #F97316;
+    --color-medium: #F59E0B;
+    --color-low: #22C55E;
+    --color-primary: #2563EB;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-[10px] border border-gray-200 shadow-card p-4;
+  }
+  .card-hover {
+    @apply hover:shadow-card-hover transition-shadow duration-200;
+  }
+  .btn-primary {
+    @apply bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-light transition-colors duration-150;
+  }
+  .btn-outline {
+    @apply border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors duration-150;
+  }
+  .badge-critical {
+    @apply bg-red-100 text-red-700 px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+  .badge-high {
+    @apply bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+  .badge-medium {
+    @apply bg-amber-100 text-amber-700 px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+  .badge-low {
+    @apply bg-green-100 text-green-700 px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+  .status-open {
+    @apply bg-red-50 text-red-600 px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .status-reviewing {
+    @apply bg-blue-50 text-blue-600 px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .status-pending {
+    @apply bg-amber-50 text-amber-600 px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .status-resolved {
+    @apply bg-green-50 text-green-600 px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .nav-item.active {
+    background-color: #1E3A5F;
+    color: white;
+    position: relative;
+  }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 20px;
+    background-color: #3B82F6;
+    border-radius: 0 2px 2px 0;
+  }
+  .select-filter {
+    @apply border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors duration-150;
+  }
+  .table-row-hover {
+    @apply hover:bg-gray-50 cursor-pointer transition-colors duration-100;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* Leaflet overrides */
+.leaflet-container {
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+}

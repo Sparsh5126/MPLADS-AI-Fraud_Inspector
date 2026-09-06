@@ -89,7 +89,7 @@ def run(works: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    works = pd.read_csv("/home/claude/mplads_ai/data/works.csv")
+    works = pd.read_csv("data/works.csv")
     scored = run(works)
     flagged = scored[scored.dup_score > 0].sort_values("dup_score", ascending=False)
     print(f"Flagged {len(flagged)} works as possible duplicates out of {len(works)} total\n")

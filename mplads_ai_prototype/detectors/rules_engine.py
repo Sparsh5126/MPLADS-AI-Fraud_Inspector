@@ -73,9 +73,9 @@ def run(works: pd.DataFrame, payments: pd.DataFrame, mps: pd.DataFrame) -> pd.Da
 
 
 if __name__ == "__main__":
-    works = pd.read_csv("/home/claude/mplads_ai/data/works.csv")
-    payments = pd.read_csv("/home/claude/mplads_ai/data/payments.csv")
-    mps = pd.read_csv("/home/claude/mplads_ai/data/mps.csv")
+    works = pd.read_csv("data/works.csv")
+    payments = pd.read_csv("data/payments.csv")
+    mps = pd.read_csv("data/mps.csv")
     scored, entitlement_breaches = run(works, payments, mps)
     flagged = scored[scored.rule_score > 0]
     print(f"Flagged {len(flagged)} works by rule engine (R1/R2/R3)\n")

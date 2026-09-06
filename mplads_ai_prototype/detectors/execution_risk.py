@@ -78,8 +78,8 @@ def run(works: pd.DataFrame, payments: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    works = pd.read_csv("/home/claude/mplads_ai/data/works.csv")
-    payments = pd.read_csv("/home/claude/mplads_ai/data/payments.csv")
+    works = pd.read_csv("data/works.csv")
+    payments = pd.read_csv("data/payments.csv")
     scored = run(works, payments)
     flagged = scored[scored.execution_risk_score > 0.3].sort_values("execution_risk_score", ascending=False)
     print(f"Flagged {len(flagged)} works for execution risk (stall/velocity)\n")

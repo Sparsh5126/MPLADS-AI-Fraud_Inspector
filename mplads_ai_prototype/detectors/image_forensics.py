@@ -86,8 +86,8 @@ def run(photos: pd.DataFrame, works: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    photos = pd.read_csv("/home/claude/mplads_ai/data/photos.csv")
-    works = pd.read_csv("/home/claude/mplads_ai/data/works.csv")
+    photos = pd.read_csv("data/photos.csv")
+    works = pd.read_csv("data/works.csv")
     scored = run(photos, works)
     # Note: score is continuous (raw GPS noise gives every photo a tiny
     # nonzero score), so "flagged" means score above a real review

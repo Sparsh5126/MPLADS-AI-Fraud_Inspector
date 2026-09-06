@@ -38,6 +38,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.inspection import permutation_importance
+from sklearn.model_selection import KFold, cross_val_predict
 
 
 def _mad_zscore(series: pd.Series) -> pd.Series:
@@ -73,8 +74,14 @@ def run(works: pd.DataFrame) -> pd.DataFrame:
         ("pre", pre),
         ("rf", RandomForestRegressor(n_estimators=300, max_depth=8, random_state=42, n_jobs=-1)),
     ])
+    # Use out-of-fold predictions for anomaly scoring. Predicting the same rows
+    # used to fit the forest makes the model look unnaturally accurate and can
+    # hide expensive works that it has memorized. Each row below is predicted
+    # by a model that was trained without that row, which is a closer estimate
+    # of how the detector will behave on a future project.
+    cv = KFold(n_splits=5, shuffle=True, random_state=42)
+    predicted = cross_val_predict(model, features, target, cv=cv, n_jobs=1)
     model.fit(features, target)
-    predicted = model.predict(features)
     residual = target - predicted
     # Normalize residual by predicted amount so we're looking at *relative*
     # overspend, not raw rupee magnitude (a small hall and a big road need

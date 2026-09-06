@@ -34,6 +34,7 @@ import pandas as pd
 APPROVAL_THRESHOLD = 1_000_000  # INR 10 lakh -- representative approval ceiling
 BAND_LOW, BAND_HIGH = 0.80, 0.99
 CLUSTER_WINDOW_DAYS = 10
+WIDE_CLUSTER_WINDOW_DAYS = 30
 
 BENFORD_EXPECTED = {d: np.log10(1 + 1 / d) for d in range(1, 10)}
 
@@ -61,21 +62,50 @@ def run(payments: pd.DataFrame, works: pd.DataFrame) -> pd.DataFrame:
     results = []
     for work_id, grp in payments.groupby("work_id"):
         grp = grp.sort_values("payment_date")
-        band_payments = grp[(grp.amount >= APPROVAL_THRESHOLD * BAND_LOW) &
-                             (grp.amount <= APPROVAL_THRESHOLD * BAND_HIGH)]
         score = 0.0
         reason = ""
-        if len(band_payments) >= 2:
-            dates = pd.to_datetime(band_payments.payment_date)
-            span_days = (dates.max() - dates.min()).days
-            if span_days <= CLUSTER_WINDOW_DAYS:
-                score = min(1.0, 0.5 + 0.15 * len(band_payments))
-                reason = (
-                    f"{len(band_payments)} payments totalling "
-                    f"₹{band_payments.amount.sum():,.0f} were each made just under the "
-                    f"₹{APPROVAL_THRESHOLD:,.0f} approval threshold, within {span_days} days of "
-                    f"each other -- consistent with structuring to avoid extra review"
-                )
+        dates = pd.to_datetime(grp.payment_date)
+
+        # The original check only caught payments in the 80%-99% band. That
+        # misses a common evasion pattern where 3-4 smaller tranches are used.
+        # We now examine rolling 30-day windows and look for a combined amount
+        # above the approval ceiling, while still requiring repeated amounts or
+        # at least one near-threshold payment to avoid flagging normal milestones.
+        amounts = grp.amount.to_numpy()
+        for start in range(len(grp)):
+            end = start
+            while end < len(grp) and (dates.iloc[end] - dates.iloc[start]).days <= WIDE_CLUSTER_WINDOW_DAYS:
+                end += 1
+            window = grp.iloc[start:end]
+            if len(window) < 2:
+                continue
+            near_threshold = window.amount.between(
+                APPROVAL_THRESHOLD * BAND_LOW, APPROVAL_THRESHOLD * BAND_HIGH
+            ).any()
+            repeated_amounts = window.amount.round(-3).value_counts().max() >= 2
+            total_above_threshold = window.amount.sum() > APPROVAL_THRESHOLD
+            if not total_above_threshold or not (near_threshold or repeated_amounts):
+                continue
+
+            span_days = (pd.to_datetime(window.payment_date).max() -
+                         pd.to_datetime(window.payment_date).min()).days
+            near_count = int(window.amount.between(
+                APPROVAL_THRESHOLD * BAND_LOW, APPROVAL_THRESHOLD * BAND_HIGH
+            ).sum())
+            # A tight near-threshold cluster is stronger evidence than a wider
+            # tranche pattern, so retain the existing high score for it and use
+            # a slightly lower score for the broader but still suspicious case.
+            if near_count >= 2 and span_days <= CLUSTER_WINDOW_DAYS:
+                score = max(score, min(1.0, 0.5 + 0.15 * near_count))
+            else:
+                score = max(score, min(0.85, 0.35 + 0.10 * len(window)))
+            reason = (
+                f"{len(window)} payments totalling ₹{window.amount.sum():,.0f} "
+                f"within {span_days} days crossed the ₹{APPROVAL_THRESHOLD:,.0f} "
+                f"approval threshold through repeated tranches -- consistent "
+                f"with structuring to avoid extra review"
+            )
+            break
         results.append({"work_id": work_id, "structuring_score": score, "structuring_reason": reason})
 
     df = pd.DataFrame(results)
@@ -93,8 +123,8 @@ def run(payments: pd.DataFrame, works: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    payments = pd.read_csv("/home/claude/mplads_ai/data/payments.csv")
-    works = pd.read_csv("/home/claude/mplads_ai/data/works.csv")
+    payments = pd.read_csv("data/payments.csv")
+    works = pd.read_csv("data/works.csv")
     scored, ia_benford = run(payments, works)
 
     flagged = scored[scored.structuring_score > 0]

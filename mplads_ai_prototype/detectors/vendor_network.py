@@ -96,9 +96,9 @@ def run(payments: pd.DataFrame, works: pd.DataFrame, ias: pd.DataFrame) -> tuple
 
 
 if __name__ == "__main__":
-    payments = pd.read_csv("/home/claude/mplads_ai/data/payments.csv")
-    works = pd.read_csv("/home/claude/mplads_ai/data/works.csv")
-    ias = pd.read_csv("/home/claude/mplads_ai/data/ias.csv")
+    payments = pd.read_csv("data/payments.csv")
+    works = pd.read_csv("data/works.csv")
+    ias = pd.read_csv("data/ias.csv")
     work_scored, ia_scored = run(payments, works, ias)
 
     print("Top flagged IAs (possible collusion rings):")

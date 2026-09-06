@@ -18,8 +18,8 @@ independent methods agreeing is much stronger evidence than one method
 being confident.
 
 So we compute:
-  1. weighted_sum   = sum of (sub-score x detector weight)   -- captures
-                       "how bad is the worst single signal"
+    1. weighted signal = the strongest (sub-score x detector weight) -- captures
+                                             "how bad is the strongest available signal"
   2. corroboration_bonus = extra weight for each ADDITIONAL detector that
                        independently fires above a minor threshold (0.3)
                        -- captures "how many independent methods agree"
@@ -49,6 +49,9 @@ import pandas as pd
 import numpy as np
 import sys, os
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 sys.path.insert(0, os.path.dirname(__file__))
 from detectors import cost_anomaly, duplicate_works, payment_structuring, execution_risk, image_forensics, vendor_network, rules_engine
 
@@ -74,9 +77,13 @@ DETECTOR_WEIGHTS = {
 
 FIRING_THRESHOLD = 0.3           # a detector "fires" if its score exceeds this
 CORROBORATION_BONUS_PER_EXTRA = 12  # points added to the 0-100 score per additional independent detector firing
+SINGLE_SIGNAL_DISCOUNT = 0.55     # isolated analytical signals need stronger evidence before escalation
+COST_SINGLE_SIGNAL_MIN = 0.80     # isolated cost anomalies must be unusually strong, not merely above baseline
 
 
-def load_data(data_dir="/home/claude/mplads_ai/data"):
+def load_data(data_dir="data"):
+    if not os.path.isabs(data_dir):
+        data_dir = os.path.join(os.path.dirname(__file__), data_dir)
     return {
         "works": pd.read_csv(f"{data_dir}/works.csv"),
         "payments": pd.read_csv(f"{data_dir}/payments.csv"),
@@ -162,6 +169,24 @@ def compute_composite_risk(df: pd.DataFrame, score_cols: list, reason_map: dict)
     # from corroboration counting too, for the same reason as above.
     firing = pd.DataFrame({c: (df[c] >= FIRING_THRESHOLD).astype(int) for c in fraud_score_cols})
     df["corroboration_count"] = firing.sum(axis=1)
+    # Cost, duplicate, image, network, and payment signals are probabilistic
+    # indicators, not proof by themselves. A single noisy signal used to push
+    # hundreds of ordinary works into Medium/High review queues. We therefore
+    # discount only isolated signals; a hard compliance breach or corroborated
+    # evidence retains its full score and the delay axis remains independent.
+    isolated_signal = df["corroboration_count"] == 1
+    base_score = base_score.where(~isolated_signal, base_score * SINGLE_SIGNAL_DISCOUNT)
+    strongest_detector = weighted_each.idxmax(axis=1)
+    isolated_cost_noise = (
+        isolated_signal
+        & strongest_detector.eq("cost_anomaly_score")
+        & df["cost_anomaly_score"].lt(COST_SINGLE_SIGNAL_MIN)
+    )
+    # Cost naturally varies with terrain, materials, and local labour rates.
+    # When cost is the only signal, a moderate deviation is not enough to open
+    # a fraud review. Cost evidence combined with another detector is retained
+    # because the independent signal makes the explanation materially stronger.
+    base_score = base_score.mask(isolated_cost_noise, 0.0)
     corroboration_bonus = (df["corroboration_count"] - 1).clip(lower=0) * CORROBORATION_BONUS_PER_EXTRA
 
     df["composite_risk_score"] = (base_score + corroboration_bonus).clip(0, 100).round(1)
@@ -213,7 +238,7 @@ def main():
     df, score_cols, reason_map, extras = run_all_detectors(data)
     df = compute_composite_risk(df, score_cols, reason_map)
 
-    out_path = "/home/claude/mplads_ai/output/risk_report.csv"
+    out_path = os.path.join(os.path.dirname(__file__), "output", "risk_report.csv")
     df.sort_values("composite_risk_score", ascending=False).to_csv(out_path, index=False)
     print(f"\nSaved full risk report -> {out_path}")
 

@@ -14,10 +14,13 @@ number a judge can interrogate, and that's what separates a hackathon toy
 from something that reads as production-credible.
 """
 
+import os
+
 import pandas as pd
 
-RISK_REPORT_PATH = "/home/claude/mplads_ai/output/risk_report.csv"
-GROUND_TRUTH_PATH = "/home/claude/mplads_ai/data/ground_truth.csv"
+PROJECT_DIR = os.path.dirname(__file__)
+RISK_REPORT_PATH = os.path.join(PROJECT_DIR, "output", "risk_report.csv")
+GROUND_TRUTH_PATH = os.path.join(PROJECT_DIR, "data", "ground_truth.csv")
 
 
 DELAY_PATTERNS = {"STALLED_OVERDUE", "VELOCITY_MISMATCH"}

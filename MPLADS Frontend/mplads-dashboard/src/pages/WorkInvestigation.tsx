@@ -17,7 +17,7 @@ export const WorkInvestigation: React.FC = () => {
         <AlertTriangle size={40} className="mb-3 text-gray-300" />
         <p className="text-lg font-medium">Work not found</p>
         <p className="text-sm mt-1">Work ID "{id}" does not exist in the database.</p>
-        <button onClick={() => navigate('/works')} className="btn-primary mt-4">Back to Works</button>
+        <button onClick={() => navigate('/ministry/works')} className="btn-primary mt-4">Back to Works</button>
       </div>
     );
   }

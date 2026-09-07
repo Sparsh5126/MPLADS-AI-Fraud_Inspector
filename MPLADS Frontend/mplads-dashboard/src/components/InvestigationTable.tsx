@@ -81,7 +81,7 @@ export const InvestigationTable: React.FC<InvestigationTableProps> = ({
               <tr
                 key={work.work_id}
                 className="table-row-hover border-b border-gray-50"
-                onClick={() => navigate(`/works/${work.work_id}`)}
+                onClick={() => navigate(`/ministry/works/${work.work_id}`)}
               >
                 <td className="px-4 py-3 text-gray-400 text-xs">
                   {showPagination ? page * pageSize + idx + 1 : idx + 1}
@@ -98,7 +98,7 @@ export const InvestigationTable: React.FC<InvestigationTableProps> = ({
                 </td>
                 <td className="px-4 py-3">
                   <button
-                    onClick={e => { e.stopPropagation(); navigate(`/works/${work.work_id}`); }}
+                    onClick={e => { e.stopPropagation(); navigate(`/ministry/works/${work.work_id}`); }}
                     className="flex items-center gap-1 text-xs text-primary hover:text-primary-light font-medium border border-primary/20 hover:border-primary/40 rounded-lg px-2.5 py-1.5 transition-all"
                   >
                     <Eye size={12} />

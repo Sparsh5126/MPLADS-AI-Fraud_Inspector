@@ -7,18 +7,10 @@ import {
 import { KpiCard } from '../components/KpiCard';
 import { RiskChart } from '../components/RiskChart';
 import { StateUPRiskMap } from '../components/StateUPRiskMap';
+import { allUPDistrictData } from '../data/upDistrictsData';
 
-// Mock UP District Data for State Dashboard
-const upDistrictData = {
-  'Meerut': { name: 'Meerut', totalWorks: 342, highRisk: 28, critical: 9, riskLevel: 'Critical' as const },
-  'Baghpat': { name: 'Baghpat', totalWorks: 281, highRisk: 21, critical: 6, riskLevel: 'Critical' as const },
-  'Ghaziabad': { name: 'Ghaziabad', totalWorks: 276, highRisk: 18, critical: 5, riskLevel: 'High' as const },
-  'Lucknow': { name: 'Lucknow', totalWorks: 412, highRisk: 17, critical: 4, riskLevel: 'High' as const },
-  'Saharanpur': { name: 'Saharanpur', totalWorks: 265, highRisk: 16, critical: 4, riskLevel: 'Medium' as const },
-  'Varanasi': { name: 'Varanasi', totalWorks: 512, highRisk: 12, critical: 2, riskLevel: 'Medium' as const },
-  'Kanpur Nagar': { name: 'Kanpur Nagar', totalWorks: 388, highRisk: 8, critical: 1, riskLevel: 'Low' as const },
-  'Agra': { name: 'Agra', totalWorks: 310, highRisk: 5, critical: 0, riskLevel: 'Low' as const },
-};
+// UP District Data for State Dashboard (Full 75 districts coverage)
+const upDistrictData = allUPDistrictData;
 
 const recentAlerts = [
   { id: '1', date: '24 Jun 2025, 08:12', workId: 'W1042', district: 'Meerut', issue: 'Unusual increase in cost', risk: 'Critical', status: 'Open' },
@@ -39,11 +31,34 @@ export const StateDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [districtFilter, setDistrictFilter] = useState('All Districts');
 
+  const { filteredDistribution, filteredTotal } = React.useMemo(() => {
+    if (districtFilter === 'All Districts') {
+      return {
+        filteredDistribution: { critical: 6, high: 481, medium: 1924, low: 10431 },
+        filteredTotal: 12842
+      };
+    }
+    
+    const data = upDistrictData[districtFilter as keyof typeof upDistrictData];
+    if (data) {
+      return {
+        filteredDistribution: {
+          critical: data.critical,
+          high: data.highRisk,
+          medium: data.mediumRisk,
+          low: data.lowRisk,
+        },
+        filteredTotal: data.totalWorks
+      };
+    }
+    return { filteredDistribution: { critical: 0, high: 0, medium: 0, low: 0 }, filteredTotal: 0 };
+  }, [districtFilter]);
+
   const quickActions = [
     { icon: <Search size={20} />, title: 'View All Works', desc: 'Search and explore MPLADS works', path: '/state/works' },
     { icon: <BarChart3 size={20} />, title: 'Analyze Anomalies', desc: 'Detailed anomaly analysis and trends', path: '/state/anomaly-analysis' },
     { icon: <IndianRupee size={20} />, title: 'Budget & Utilization', desc: 'Fund allocation and expenditure', path: '/state/budget' },
-    { icon: <Users size={20} />, title: 'IAS Performance', desc: 'Monitor district performance', path: '/state/ias-performance' },
+    { icon: <Users size={20} />, title: 'IA Performance', desc: 'Monitor district performance', path: '/state/ia-performance' },
   ];
 
   return (
@@ -88,7 +103,7 @@ export const StateDashboard: React.FC = () => {
             </select>
           </div>
           <div className="h-64">
-            <RiskChart distribution={{ critical: 6, high: 481, medium: 1924, low: 10431 }} total={12842} />
+            <RiskChart distribution={filteredDistribution} total={filteredTotal} />
           </div>
         </div>
 
@@ -122,7 +137,10 @@ export const StateDashboard: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="text-sm">
-                    {Object.values(upDistrictData).slice(0, 5).map((d, i) => (
+                    {Object.values(upDistrictData)
+                      .sort((a, b) => b.critical - a.critical || b.highRisk - a.highRisk)
+                      .slice(0, 5)
+                      .map((d, i) => (
                       <tr key={d.name} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group cursor-pointer" onClick={() => navigate('/state/districts')}>
                         <td className="py-2.5 text-xs text-gray-400 font-mono">{i + 1}</td>
                         <td className="py-2.5 font-medium text-gray-800 group-hover:text-blue-600 transition-colors">{d.name}</td>

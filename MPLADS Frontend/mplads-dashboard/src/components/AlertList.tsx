@@ -45,7 +45,7 @@ export const AlertList: React.FC<AlertListProps> = ({ alerts, limit }) => {
         <div
           key={alert.id}
           className="flex items-start gap-3 py-3 first:pt-0 last:pb-0 cursor-pointer hover:bg-gray-50 -mx-4 px-4 rounded-lg transition-colors"
-          onClick={() => navigate(`/works/${alert.work_id}`)}
+          onClick={() => navigate(`/ministry/works/${alert.work_id}`)}
         >
           <div
             className="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 mt-0.5"

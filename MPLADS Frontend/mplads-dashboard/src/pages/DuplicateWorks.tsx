@@ -42,7 +42,7 @@ export const DuplicateWorks: React.FC = () => {
                 <span className="font-mono font-bold text-primary text-lg">{work.id}</span>
                 <RiskBadge level={work.risk} />
               </div>
-              <button onClick={() => navigate(`/works/${work.id}`)} className="flex items-center gap-1 text-xs text-primary border border-primary/20 rounded-lg px-2.5 py-1.5 hover:bg-primary/5">
+                  <button onClick={() => navigate(`/ministry/works/${work.id}`)} className="flex items-center gap-1 text-xs text-primary border border-primary/20 rounded-lg px-2.5 py-1.5 hover:bg-primary/5">
                 <Eye size={12} /> View
               </button>
             </div>

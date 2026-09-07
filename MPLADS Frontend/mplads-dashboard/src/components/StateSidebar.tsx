@@ -11,7 +11,7 @@ const navItems = [
   { path: '/state/districts', icon: MapPin, label: 'Districts' },
   { path: '/state/anomaly-analysis', icon: AlertTriangle, label: 'Anomaly Analysis' },
   { path: '/state/compare-districts', icon: GitCompare, label: 'Compare Districts' },
-  { path: '/state/ias-performance', icon: Users, label: 'IAS Performance' },
+  { path: '/state/ia-performance', icon: Users, label: 'IA Performance' },
   { path: '/state/budget', icon: IndianRupee, label: 'Budget & Utilization' },
   { path: '/state/reports', icon: FileBarChart, label: 'Reports' },
   { path: '/state/settings', icon: Settings, label: 'Settings' },

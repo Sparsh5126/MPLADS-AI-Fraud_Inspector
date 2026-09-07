@@ -83,7 +83,7 @@ export const Topbar: React.FC<TopbarProps> = ({ sidebarWidth }) => {
               <div
                 key={w.work_id}
                 className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer"
-                onClick={() => { navigate(`/works/${w.work_id}`); setShowResults(false); setSearchQuery(''); }}
+                onClick={() => { navigate(`/ministry/works/${w.work_id}`); setShowResults(false); setSearchQuery(''); }}
               >
                 <span className="font-mono text-xs font-bold text-primary">{w.work_id}</span>
                 <span className="text-sm text-gray-700 flex-1 truncate">{w.title}</span>

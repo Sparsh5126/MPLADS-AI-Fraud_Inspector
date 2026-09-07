@@ -55,7 +55,7 @@ export const StateDashboard: React.FC = () => {
   }, [districtFilter]);
 
   const quickActions = [
-    { icon: <Search size={20} />, title: 'View All Works', desc: 'Search and explore MPLADS works', path: '/state/works' },
+    { icon: <Search size={20} />, title: 'View All Works', desc: 'Search and explore Yatharth works', path: '/state/works' },
     { icon: <BarChart3 size={20} />, title: 'Analyze Anomalies', desc: 'Detailed anomaly analysis and trends', path: '/state/anomaly-analysis' },
     { icon: <IndianRupee size={20} />, title: 'Budget & Utilization', desc: 'Fund allocation and expenditure', path: '/state/budget' },
     { icon: <Users size={20} />, title: 'IA Performance', desc: 'Monitor district performance', path: '/state/ia-performance' },
@@ -67,7 +67,7 @@ export const StateDashboard: React.FC = () => {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Welcome, Uttar Pradesh</h1>
-          <p className="text-sm text-gray-500 mt-1">Monitor MPLADS implementation and address potential anomalies</p>
+          <p className="text-sm text-gray-500 mt-1">Monitor Yatharth implementation and address potential anomalies</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm">
           <FileText size={14} className="text-gray-400" />

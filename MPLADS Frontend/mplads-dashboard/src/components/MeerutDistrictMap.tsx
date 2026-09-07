@@ -1,11 +1,4 @@
-import React, { useState } from 'react';
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  ZoomableGroup,
-  Marker,
-} from 'react-simple-maps';
+import React, { useState, useEffect, useRef } from 'react';
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -29,7 +22,7 @@ export interface MeerutDistrictMapProps {
   onRegionClick?: (name: string, data: TehsilData) => void;
 }
 
-// ─── Color helpers ─────────────────────────────────────────────────────────────
+// ─── Color helpers ────────────────────────────────────────────────────────────
 
 const normalize = (s: string) => s.trim().toLowerCase().replace(/\s+/g, ' ');
 
@@ -42,15 +35,6 @@ function workloadColor(works: number): string {
   return '#16A34A';
 }
 
-function workloadHover(works: number): string {
-  if (works === 0) return '#94A3B8';
-  if (works > 100) return '#B91C1C';
-  if (works > 60)  return '#C2410C';
-  if (works > 30)  return '#B45309';
-  if (works > 10)  return '#4D7C0F';
-  return '#15803D';
-}
-
 function delayColor(rateStr: string): string {
   const r = parseFloat(rateStr.replace('%', ''));
   if (isNaN(r)) return '#CBD5E1';
@@ -60,15 +44,6 @@ function delayColor(rateStr: string): string {
   return '#16A34A';
 }
 
-function delayHover(rateStr: string): string {
-  const r = parseFloat(rateStr.replace('%', ''));
-  if (isNaN(r)) return '#94A3B8';
-  if (r > 40) return '#B91C1C';
-  if (r > 25) return '#C2410C';
-  if (r > 10) return '#B45309';
-  return '#15803D';
-}
-
 function riskColor(level?: string): string {
   switch (level) {
     case 'Critical': return '#DC2626';
@@ -76,16 +51,6 @@ function riskColor(level?: string): string {
     case 'Medium':   return '#D97706';
     case 'Low':      return '#16A34A';
     default:         return '#CBD5E1';
-  }
-}
-
-function riskHover(level?: string): string {
-  switch (level) {
-    case 'Critical': return '#B91C1C';
-    case 'High':     return '#C2410C';
-    case 'Medium':   return '#B45309';
-    case 'Low':      return '#15803D';
-    default:         return '#94A3B8';
   }
 }
 
@@ -99,15 +64,12 @@ function getFill(metric: MapMetric, data: TehsilData | null): string {
 }
 
 function getHover(metric: MapMetric, data: TehsilData | null): string {
-  if (!data) return '#94A3B8';
-  switch (metric) {
-    case 'workload': return workloadHover(data.works);
-    case 'delay':    return delayHover(data.delayRate);
-    case 'risk':     return riskHover(data.riskLevel);
-  }
+  const base = getFill(metric, data);
+  // darken by ~12% for hover
+  return base === '#CBD5E1' ? '#94A3B8' : base;
 }
 
-// ─── Legend config ─────────────────────────────────────────────────────────────
+// ─── Legend config ────────────────────────────────────────────────────────────
 
 const LEGENDS: Record<MapMetric, Array<{ color: string; label: string }>> = {
   workload: [
@@ -142,29 +104,13 @@ function buildTooltip(metric: MapMetric, name: string, data: TehsilData | null, 
   }
   const rows: Array<[string, string]> =
     metric === 'workload'
-      ? [
-          ['Total Works', String(data.works)],
-          ['Active', String(data.activeWorks)],
-          ['High Risk', String(data.highRisk)],
-          ['Delayed', String(data.delayed)],
-        ]
+      ? [['Total Works', String(data.works)], ['Active', String(data.activeWorks)], ['High Risk', String(data.highRisk)], ['Delayed', String(data.delayed)]]
       : metric === 'delay'
-      ? [
-          ['Delay Rate', data.delayRate],
-          ['Delayed Works', String(data.delayed)],
-          ['Total Works', String(data.works)],
-        ]
-      : [
-          ['Risk Level', data.riskLevel ?? 'No Data'],
-          ['High Risk Works', String(data.highRisk)],
-          ['Total Works', String(data.works)],
-        ];
+      ? [['Delay Rate', data.delayRate], ['Delayed Works', String(data.delayed)], ['Total Works', String(data.works)]]
+      : [['Risk Level', data.riskLevel ?? 'No Data'], ['High Risk Works', String(data.highRisk)], ['Total Works', String(data.works)]];
 
   const rowsHtml = rows
-    .map(
-      ([k, v]) =>
-        `<div style="display:flex;justify-content:space-between;gap:16px;font-size:11px;margin-top:3px"><span style="color:#94A3B8">${k}</span><span style="font-weight:600;color:#1E293B">${v}</span></div>`
-    )
+    .map(([k, v]) => `<div style="display:flex;justify-content:space-between;gap:16px;font-size:11px;margin-top:3px"><span style="color:#94A3B8">${k}</span><span style="font-weight:600;color:#1E293B">${v}</span></div>`)
     .join('');
 
   return `
@@ -178,21 +124,97 @@ function buildTooltip(metric: MapMetric, name: string, data: TehsilData | null, 
   `;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Pure-SVG Mercator projection ─────────────────────────────────────────────
+//
+// Meerut district bbox (from up-districts.json):
+//   lon  77.4227 → 78.1239   (span 0.7012°)
+//   lat  28.7366 → 29.2659   (span 0.5293°)
+//
+// We project to a 760×560 logical canvas with 20px padding on each side,
+// giving a final 800×600 SVG with the district perfectly filling the space.
 
-// Pre-computed 6 blocks of Meerut district
-const MEERUT_GEO_URL = '/meerut-blocks.geojson';
-const INIT_CENTER: [number, number] = [77.77, 29.00];
-const INIT_ZOOM = 1;
+const SVG_W = 800;
+const SVG_H = 600;
+const PAD   = 30; // pixels of padding on each side
 
-const BLOCK_CENTROIDS: Record<string, [number, number]> = {
-  'Sardhana': [77.5042, 29.1445],
-  'Daurala': [77.7792, 29.1972],
-  'Mawana': [77.9876, 29.1622],
-  'Hastinapur': [78.0613, 28.9564],
-  'Meerut City': [77.6045, 28.8825],
-  'Kithor': [77.8443, 28.8191],
+// Geographic bounds of Meerut district
+const GEO_MIN_LON = 77.4227;
+const GEO_MAX_LON = 78.1239;
+const GEO_MIN_LAT = 28.7366;
+const GEO_MAX_LAT = 29.2659;
+
+// Mercator Y value for a latitude
+const mercY = (lat: number) => Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
+
+const MERC_Y_MIN = mercY(GEO_MIN_LAT);
+const MERC_Y_MAX = mercY(GEO_MAX_LAT);
+
+// Scale factors: how many pixels per degree-lon and per mercator-unit
+const AVAIL_W = SVG_W - 2 * PAD;
+const AVAIL_H = SVG_H - 2 * PAD;
+
+const SCALE_X = AVAIL_W / (GEO_MAX_LON - GEO_MIN_LON);
+const SCALE_Y = AVAIL_H / (MERC_Y_MAX - MERC_Y_MIN);
+
+function projectPoint([lon, lat]: [number, number]): [number, number] {
+  const x = PAD + (lon - GEO_MIN_LON) * SCALE_X;
+  // Mercator Y increases northward but SVG Y increases downward, so flip
+  const y = PAD + (MERC_Y_MAX - mercY(lat)) * SCALE_Y;
+  return [x, y];
+}
+
+// Build an SVG path "d" string from a GeoJSON ring (array of [lon,lat])
+function ringToPath(ring: [number, number][]): string {
+  return ring
+    .map((pt, i) => {
+      const [x, y] = projectPoint(pt);
+      return `${i === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`;
+    })
+    .join(' ') + ' Z';
+}
+
+// Build full path "d" from a GeoJSON geometry (Polygon or MultiPolygon)
+function geometryToPath(geometry: { type: string; coordinates: any }): string {
+  if (geometry.type === 'Polygon') {
+    return (geometry.coordinates as [number, number][][]).map(ringToPath).join(' ');
+  }
+  if (geometry.type === 'MultiPolygon') {
+    return (geometry.coordinates as [number, number][][][])
+      .flatMap(poly => poly.map(ringToPath))
+      .join(' ');
+  }
+  return '';
+}
+
+// Centroid of each tehsil in geographic coordinates (used for labels)
+const LABEL_POS: Record<string, [number, number]> = {
+  Sardhana:      [77.56, 29.17],
+  Daurala:       [77.74, 29.13],
+  Mawana:        [77.93, 29.20],
+  Hastinapur:    [78.01, 29.10],
+  'Meerut City': [77.67, 28.94],
+  Kithor:        [77.95, 28.86],
 };
+
+// ─── GeoJSON loader hook ──────────────────────────────────────────────────────
+
+interface GeoFeature {
+  properties: { name: string };
+  geometry: { type: string; coordinates: any };
+}
+
+function useMeerutBlocks() {
+  const [blocks, setBlocks] = useState<GeoFeature[]>([]);
+  useEffect(() => {
+    fetch('/meerut-blocks.geojson')
+      .then(r => r.json())
+      .then(fc => setBlocks(fc.features ?? []))
+      .catch(console.error);
+  }, []);
+  return blocks;
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export const MeerutDistrictMap: React.FC<MeerutDistrictMapProps> = ({
   metric,
@@ -200,15 +222,14 @@ export const MeerutDistrictMap: React.FC<MeerutDistrictMapProps> = ({
   height = 360,
   onRegionClick,
 }) => {
-  const [tooltip, setTooltip] = useState<{ content: string; x: number; y: number } | null>(null);
-  const [position, setPosition] = useState<{
-    coordinates: [number, number];
-    zoom: number;
-  }>({ coordinates: INIT_CENTER, zoom: INIT_ZOOM });
-
-  const zoomIn  = () => setPosition(p => ({ ...p, zoom: Math.min(p.zoom * 1.5, 8) }));
-  const zoomOut = () => setPosition(p => ({ ...p, zoom: Math.max(p.zoom / 1.5, 1) }));
-  const reset   = () => setPosition({ coordinates: INIT_CENTER, zoom: INIT_ZOOM });
+  const blocks = useMeerutBlocks();
+  const [tooltip, setTooltip] = useState<{ html: string; x: number; y: number } | null>(null);
+  const [hoveredName, setHoveredName] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState<[number, number]>([0, 0]);
+  const dragging = useRef(false);
+  const lastMouse = useRef<[number, number]>([0, 0]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const resolve = (rawName: string): TehsilData | null => {
     const norm = normalize(rawName);
@@ -221,128 +242,132 @@ export const MeerutDistrictMap: React.FC<MeerutDistrictMapProps> = ({
     return key ? regionData[key] : null;
   };
 
+  const zoomIn  = () => setZoom(z => Math.min(z * 1.5, 8));
+  const zoomOut = () => setZoom(z => Math.max(z / 1.5, 1));
+  const reset   = () => { setZoom(1); setPan([0, 0]); };
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    dragging.current = true;
+    lastMouse.current = [e.clientX, e.clientY];
+  };
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (dragging.current) {
+      const dx = e.clientX - lastMouse.current[0];
+      const dy = e.clientY - lastMouse.current[1];
+      lastMouse.current = [e.clientX, e.clientY];
+      setPan(([px, py]) => [px + dx, py + dy]);
+    }
+    if (tooltip && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setTooltip(t => t ? { ...t, x: e.clientX - rect.left, y: e.clientY - rect.top } : null);
+    }
+  };
+  const onMouseUp = () => { dragging.current = false; };
+
+  // SVG transform for zoom+pan
+  const transform = `translate(${pan[0]}, ${pan[1]}) scale(${zoom})`;
+  const transformOrigin = `${SVG_W / 2}px ${SVG_H / 2}px`;
+
   return (
     <div
+      ref={containerRef}
       className="w-full relative select-none"
-      style={{ height, background: 'white' }}
-      onMouseMove={(e) => {
-        if (tooltip) {
-          const rect = e.currentTarget.getBoundingClientRect();
-          setTooltip(prev => prev ? { ...prev, x: e.clientX - rect.left, y: e.clientY - rect.top } : null);
-        }
-      }}
-      onMouseLeave={() => setTooltip(null)}
+      style={{ height, background: '#ffffff', cursor: dragging.current ? 'grabbing' : 'grab' }}
+      onMouseDown={onMouseDown}
+      onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
+      onMouseLeave={() => { onMouseUp(); setTooltip(null); setHoveredName(null); }}
     >
-      {/* ── Map canvas ── */}
-      {/*
-        projectionConfig.scale = 35000 makes Meerut district (~0.75° wide)
-        render at ~460px within an 800px-wide SVG → good fit with padding.
-        The SVG is rendered at 100% width/height but internally uses
-        width=800, height=600 coordinates.
-      */}
-      <ComposableMap
-        projection="geoMercator"
-        projectionConfig={{
-          scale: 36000,
-          center: [77.77, 29.00],
-        }}
-        width={800}
-        height={600}
-        style={{ width: '100%', height: '100%', backgroundColor: '#ffffff' }}
+      {/* ── SVG canvas ── */}
+      <svg
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+        preserveAspectRatio="xMidYMid meet"
+        style={{ display: 'block', background: '#ffffff' }}
       >
-        {/* Pure white background */}
-        <rect x={0} y={0} width={800} height={600} fill="#ffffff" />
+        {/* White background */}
+        <rect x={0} y={0} width={SVG_W} height={SVG_H} fill="#ffffff" />
 
-        <ZoomableGroup
-          zoom={position.zoom}
-          center={position.coordinates}
-          onMoveEnd={pos => setPosition(pos as typeof position)}
-          minZoom={1}
-          maxZoom={8}
-        >
-          <Geographies geography={MEERUT_GEO_URL}>
-            {({ geographies }) => (
-              <>
-                {/* Phase 1: Draw the 6 filled regions */}
-                {geographies.map((geo, i) => {
-                  const rawName = geo.properties.name || '';
-                  const data = resolve(rawName);
-                  
-                  let fill = '#CBD5E1'; // No Data grey
-                  if (data) {
-                    fill =
-                      metric === 'workload'
-                        ? workloadColor(data.works)
-                        : metric === 'delay'
-                        ? delayColor(data.delayRate)
-                        : riskColor(data.riskLevel || 'No Data');
+        {/* Zoom+pan group */}
+        <g transform={transform} style={{ transformOrigin }}>
+          {/* Filled block regions */}
+          {blocks.map((block) => {
+            const name = block.properties.name || '';
+            const data = resolve(name);
+            const fill = getFill(metric, data);
+            const isHovered = hoveredName === name;
+            const displayFill = isHovered ? getHover(metric, data) : fill;
+
+            return (
+              <path
+                key={name}
+                d={geometryToPath(block.geometry)}
+                fill={displayFill}
+                stroke="#ffffff"
+                strokeWidth={1.5 / zoom}
+                strokeLinejoin="round"
+                style={{ transition: 'fill 0.15s ease', cursor: 'pointer' }}
+                onClick={() => data && onRegionClick?.(name, data)}
+                onMouseEnter={(e) => {
+                  setHoveredName(name);
+                  if (containerRef.current) {
+                    const rect = containerRef.current.getBoundingClientRect();
+                    setTooltip({
+                      html: buildTooltip(metric, name, data, fill),
+                      x: e.clientX - rect.left,
+                      y: e.clientY - rect.top,
+                    });
                   }
-                  
-                  return (
-                    <Geography
-                      key={geo.rsmKey || i}
-                      geography={geo}
-                      fill={fill}
-                      stroke="#ffffff"
-                      strokeWidth={2}
-                      onClick={() => data && onRegionClick?.(rawName, data)}
-                      onMouseEnter={(e) => {
-                        const rect = e.currentTarget.closest('.relative')?.getBoundingClientRect();
-                        const x = rect ? e.clientX - rect.left : e.clientX;
-                        const y = rect ? e.clientY - rect.top : e.clientY;
-                        setTooltip({
-                          content: buildTooltip(metric, rawName, data, fill),
-                          x,
-                          y
-                        });
-                      }}
-                      onMouseLeave={() => setTooltip(null)}
-                      style={{
-                        default: {
-                          outline: 'none',
-                          transition: 'fill 0.15s ease',
-                        },
-                        hover: {
-                          fill: getHover(metric, data),
-                          outline: 'none',
-                          cursor: 'pointer',
-                          transition: 'fill 0.15s ease',
-                        },
-                        pressed: { outline: 'none' },
-                      }}
-                    />
-                  );
-                })}
+                }}
+                onMouseLeave={() => { setHoveredName(null); setTooltip(null); }}
+              />
+            );
+          })}
 
-                {/* Phase 2: Draw the labels centered on each region */}
-                {geographies.map((geo, i) => {
-                  const rawName = geo.properties.name || '';
-                  const centroid = BLOCK_CENTROIDS[rawName] || [77.77, 29.00];
+          {/* Outer district boundary stroke (crisp outline matching reference shape) */}
+          {blocks.map((block) => (
+            <path
+              key={`outline-${block.properties.name}`}
+              d={geometryToPath(block.geometry)}
+              fill="none"
+              stroke="#ffffff"
+              strokeWidth={2 / zoom}
+              strokeLinejoin="round"
+              pointerEvents="none"
+            />
+          ))}
 
-                  return (
-                    <Marker key={`marker-${i}`} coordinates={centroid as [number, number]}>
-                      <text
-                        textAnchor="middle"
-                        y={4}
-                        style={{
-                          fontFamily: 'system-ui, -apple-system, sans-serif',
-                          fill: '#0F172A',
-                          fontSize: '12px',
-                          fontWeight: 700,
-                          pointerEvents: 'none',
-                          textShadow: '0 1px 2px rgba(255,255,255,0.9), 0 0 2px rgba(255,255,255,0.9)'
-                        }}
-                      >
-                        {rawName}
-                      </text>
-                    </Marker>
-                  );
-                })}
-              </>
-            )}
-          </Geographies>
-        </ZoomableGroup>
-      </ComposableMap>
+          {/* Labels */}
+          {blocks.map((block) => {
+            const name = block.properties.name || '';
+            const pos = LABEL_POS[name];
+            if (!pos) return null;
+            const [lx, ly] = projectPoint(pos);
+            return (
+              <text
+                key={`label-${name}`}
+                x={lx}
+                y={ly}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill="#0F172A"
+                stroke="rgba(255,255,255,0.8)"
+                strokeWidth={3 / zoom}
+                paintOrder="stroke"
+                style={{
+                  fontSize: `${11 / zoom}px`,
+                  fontWeight: 700,
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  pointerEvents: 'none',
+                }}
+              >
+                {name}
+              </text>
+            );
+          })}
+        </g>
+      </svg>
 
       {/* ── Zoom controls ── */}
       <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
@@ -354,7 +379,7 @@ export const MeerutDistrictMap: React.FC<MeerutDistrictMapProps> = ({
           <button
             key={label}
             aria-label={label}
-            onClick={action}
+            onClick={(e) => { e.stopPropagation(); action(); }}
             className="w-6 h-6 rounded bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-all"
           >
             {icon}
@@ -370,10 +395,7 @@ export const MeerutDistrictMap: React.FC<MeerutDistrictMapProps> = ({
         <div className="flex flex-col gap-1">
           {LEGENDS[metric].map(({ color, label }) => (
             <div key={label} className="flex items-center gap-1.5">
-              <div
-                className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
-                style={{ backgroundColor: color }}
-              />
+              <div className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: color }} />
               <span className="text-[9px] font-medium text-gray-600 whitespace-nowrap">{label}</span>
             </div>
           ))}
@@ -383,12 +405,9 @@ export const MeerutDistrictMap: React.FC<MeerutDistrictMapProps> = ({
       {/* ── Tooltip ── */}
       {tooltip && (
         <div
-          className="pointer-events-none absolute z-50 bg-white text-gray-800 border border-gray-200 shadow-xl rounded-xl opacity-100 p-0"
-          style={{
-            left: tooltip.x + 15,
-            top: tooltip.y + 15,
-          }}
-          dangerouslySetInnerHTML={{ __html: tooltip.content }}
+          className="pointer-events-none absolute z-50 bg-white text-gray-800 border border-gray-200 shadow-xl rounded-xl"
+          style={{ left: tooltip.x + 15, top: tooltip.y + 15 }}
+          dangerouslySetInnerHTML={{ __html: tooltip.html }}
         />
       )}
     </div>

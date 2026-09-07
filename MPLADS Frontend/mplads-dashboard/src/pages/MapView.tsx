@@ -30,7 +30,7 @@ export const MapView: React.FC = () => {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Map View</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Geographic distribution of MPLADS works and risk concentration</p>
+        <p className="text-sm text-gray-500 mt-0.5">Geographic distribution of Yatharth works and risk concentration</p>
       </div>
 
       {/* Filters */}

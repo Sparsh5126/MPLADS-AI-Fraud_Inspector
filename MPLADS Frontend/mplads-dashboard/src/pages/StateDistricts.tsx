@@ -29,7 +29,7 @@ export const StateDistricts: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Districts Overview</h1>
-        <p className="text-sm text-gray-500 mt-1">District-wise MPLADS performance and risk assessment for Uttar Pradesh</p>
+        <p className="text-sm text-gray-500 mt-1">District-wise Yatharth performance and risk assessment for Uttar Pradesh</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

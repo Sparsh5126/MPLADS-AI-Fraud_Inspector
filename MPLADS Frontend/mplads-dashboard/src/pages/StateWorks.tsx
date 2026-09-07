@@ -43,7 +43,7 @@ export const StateWorks: React.FC = () => {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Works & Projects</h1>
-          <p className="text-sm text-gray-500 mt-1">Browse and monitor all MPLADS works in Uttar Pradesh</p>
+          <p className="text-sm text-gray-500 mt-1">Browse and monitor all Yatharth works in Uttar Pradesh</p>
         </div>
         <button className="flex items-center gap-2 bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
           <Download size={15} /> Export Report

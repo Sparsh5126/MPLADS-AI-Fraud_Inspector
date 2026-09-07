@@ -32,7 +32,7 @@ export const MPRecommended: React.FC = () => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900">Recommended Works</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Works proposed for MPLADS sanction — Meerut constituency</p>
+          <p className="text-sm text-gray-500 mt-0.5">Works proposed for Yatharth sanction — Meerut constituency</p>
         </div>
         <button className="flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
           <BookMarked size={15} /> Propose New Work

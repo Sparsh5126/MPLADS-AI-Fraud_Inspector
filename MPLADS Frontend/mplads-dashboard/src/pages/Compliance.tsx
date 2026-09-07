@@ -53,7 +53,7 @@ export const Compliance: React.FC = () => {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Compliance Rules</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Rule-based monitoring of MPLADS guidelines and regulatory requirements</p>
+        <p className="text-sm text-gray-500 mt-0.5">Rule-based monitoring of Yatharth guidelines and regulatory requirements</p>
       </div>
 
       {/* Summary */}

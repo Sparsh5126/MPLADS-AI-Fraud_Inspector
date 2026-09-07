@@ -58,7 +58,7 @@ const ConstituencyMap: React.FC = () => {
           <div className="group relative cursor-help">
             <Info size={13} className="text-gray-400" />
             <div className="absolute left-5 top-0 hidden group-hover:block w-52 bg-gray-800 text-white text-xs rounded-lg p-2.5 z-50 shadow-lg">
-              Number of MPLADS works per tehsil in Meerut constituency.
+              Number of Yatharth works per tehsil in Meerut constituency.
             </div>
           </div>
         </div>
@@ -122,7 +122,7 @@ export const MPDashboard: React.FC = () => {
             Welcome, Shri Rajendra Agrawal
           </h1>
           <p className="text-sm text-[#64748B] mt-1">
-            Track the progress of MPLADS works in your constituency and ensure greater impact
+            Track the progress of Yatharth works in your constituency and ensure greater impact
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm flex-shrink-0">
@@ -183,14 +183,14 @@ export const MPDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* 4. Total MPLADS Fund */}
+        {/* 4. Total Yatharth Fund */}
         <div className="min-w-0 overflow-hidden h-full bg-white border border-[#E2E8F0] rounded-xl shadow-sm p-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
               <IndianRupee size={20} className="text-green-600" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-medium text-gray-500">Total MPLADS Fund</p>
+              <p className="text-xs font-medium text-gray-500">Total Yatharth Fund</p>
               <p className="text-[22px] font-extrabold text-gray-900 leading-tight">₹25.0 Cr</p>
               <p className="text-xs text-gray-400 mt-0.5">(₹5 Cr per year)</p>
             </div>
@@ -228,7 +228,7 @@ export const MPDashboard: React.FC = () => {
             <div className="group relative cursor-help ml-0.5">
               <Info size={13} className="text-gray-400" />
               <div className="absolute left-5 top-0 hidden group-hover:block w-44 bg-gray-800 text-white text-xs rounded-lg p-2.5 z-50 shadow-lg">
-                Current status breakdown of all 1,248 MPLADS works.
+                Current status breakdown of all 1,248 Yatharth works.
               </div>
             </div>
           </div>
@@ -287,7 +287,7 @@ export const MPDashboard: React.FC = () => {
                 <div className="group relative cursor-help">
                   <Info size={13} className="text-gray-400" />
                   <div className="absolute left-5 top-0 hidden group-hover:block w-40 bg-gray-800 text-white text-xs rounded-lg p-2 z-50 shadow-lg">
-                    Latest MPLADS works activity.
+                    Latest Yatharth works activity.
                   </div>
                 </div>
               </div>
@@ -476,7 +476,7 @@ export const MPDashboard: React.FC = () => {
             {
               icon: FileText, iconBg: 'bg-blue-50', iconColor: 'text-blue-600',
               title: 'View My Works',
-              desc: 'Search and manage your MPLADS works',
+              desc: 'Search and manage your Yatharth works',
               path: '/mp/works',
             },
             {

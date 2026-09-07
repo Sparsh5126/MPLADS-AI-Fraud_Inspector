@@ -42,7 +42,7 @@ export const MPWorks: React.FC = () => {
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900">My MPLADS Works</h1>
+          <h1 className="text-2xl font-extrabold text-gray-900">My Yatharth Works</h1>
           <p className="text-sm text-gray-500 mt-0.5">All sanctioned works — Meerut constituency</p>
         </div>
         <div className="flex gap-2">

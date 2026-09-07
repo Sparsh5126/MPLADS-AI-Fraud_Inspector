@@ -29,7 +29,7 @@ export const MPConstituency: React.FC = () => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900">Constituency Overview</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Meerut constituency — MPLADS works distribution map</p>
+          <p className="text-sm text-gray-500 mt-0.5">Meerut constituency — Yatharth works distribution map</p>
         </div>
       </div>
 

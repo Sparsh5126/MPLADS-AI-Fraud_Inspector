@@ -23,7 +23,7 @@ export const MPAgencies: React.FC = () => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900">Implementing Agencies</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Agencies executing MPLADS works in Meerut constituency</p>
+          <p className="text-sm text-gray-500 mt-0.5">Agencies executing Yatharth works in Meerut constituency</p>
         </div>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search agency..."
           className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none w-56" />

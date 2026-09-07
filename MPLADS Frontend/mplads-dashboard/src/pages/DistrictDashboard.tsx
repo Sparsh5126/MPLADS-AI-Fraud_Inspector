@@ -62,7 +62,7 @@ const DistrictHeatmap: React.FC<HeatmapProps> = ({ type, title }) => {
           <Info size={14} className="text-gray-400" />
           <div className="absolute left-5 top-0 hidden group-hover:block w-52 bg-gray-800 text-white text-xs rounded-lg p-2.5 z-50 shadow-lg leading-relaxed">
             {type === 'workload'
-              ? 'Shows concentration of MPLADS works across Meerut tehsils. Darker = more works assigned.'
+              ? 'Shows concentration of Yatharth works across Meerut tehsils. Darker = more works assigned.'
               : 'Shows % of delayed works per tehsil. Red = high delay rate.'}
           </div>
         </div>
@@ -134,7 +134,7 @@ export const DistrictDashboard: React.FC = () => {
             Welcome, Meerut
           </h1>
           <p className="text-sm text-[#64748B] mt-1">
-            Monitor MPLADS works, track progress and address potential anomalies
+            Monitor Yatharth works, track progress and address potential anomalies
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm">
@@ -386,7 +386,7 @@ export const DistrictDashboard: React.FC = () => {
           {[
             {
               icon: FileText, iconBg: 'bg-blue-50', iconColor: 'text-blue-600',
-              title: 'View All Works', desc: 'Search and manage MPLADS works in Meerut',
+              title: 'View All Works', desc: 'Search and manage Yatharth works in Meerut',
               path: '/district/works',
             },
             {

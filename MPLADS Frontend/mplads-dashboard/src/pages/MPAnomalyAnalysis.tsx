@@ -34,7 +34,7 @@ export const MPAnomalyAnalysis: React.FC = () => {
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-extrabold text-gray-900">Anomaly Analysis</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Detected irregularities in Meerut constituency MPLADS works</p>
+        <p className="text-sm text-gray-500 mt-0.5">Detected irregularities in Meerut constituency Yatharth works</p>
       </div>
 
       {/* Summary KPIs */}

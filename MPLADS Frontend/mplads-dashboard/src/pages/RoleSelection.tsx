@@ -36,7 +36,7 @@ export const RoleSelection: React.FC = () => {
     {
       id: 'mp',
       title: 'Member of Parliament',
-      description: 'Constituency overview, MPLADS works tracking, fund utilisation, and recommended works.',
+      description: 'Constituency overview, Yatharth works tracking, fund utilisation, and recommended works.',
       icon: <UserSquare2 size={32} className="text-amber-600" />,
       bg: 'bg-amber-50',
       border: 'border-amber-200',
@@ -51,7 +51,7 @@ export const RoleSelection: React.FC = () => {
           <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <Landmark size={32} className="text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">MPLADS Monitoring Portal</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Yatharth Monitoring Portal</h1>
           <p className="text-gray-500 max-w-xl mx-auto">
             Select your role to access the appropriate dashboard. Each view provides tailored insights and controls for your administrative level.
           </p>

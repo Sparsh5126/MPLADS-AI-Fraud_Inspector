@@ -56,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="text-white font-bold text-sm leading-tight">MPLADS</p>
+              <p className="text-white font-bold text-sm leading-tight">Yatharth</p>
               <p className="text-blue-300 text-[10px] leading-tight">Fraud & Anomaly Detection</p>
             </div>
           )}
@@ -105,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
             <p className="text-white/50 text-[10px] italic leading-relaxed mb-2">
               "Accountability today for a better tomorrow."
             </p>
-            <p className="text-white/30 text-[9px] uppercase tracking-wider">MPLADS</p>
+            <p className="text-white/30 text-[9px] uppercase tracking-wider">Yatharth</p>
             <p className="text-white/25 text-[9px]">People's Development, People's Trust</p>
           </div>
         </div>

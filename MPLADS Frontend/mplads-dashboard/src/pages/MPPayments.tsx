@@ -30,7 +30,7 @@ export const MPPayments: React.FC = () => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900">Payments</h1>
-          <p className="text-sm text-gray-500 mt-0.5">MPLADS fund disbursement for Meerut constituency</p>
+          <p className="text-sm text-gray-500 mt-0.5">Yatharth fund disbursement for Meerut constituency</p>
         </div>
         <button className="flex items-center gap-2 text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 hover:bg-gray-50 text-gray-700">
           <Download size={15} /> Export

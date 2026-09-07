@@ -88,7 +88,7 @@ export const StateSettings: React.FC = () => {
               <h2 className="text-base font-semibold text-gray-800 flex items-center gap-2"><Bell size={16} className="text-blue-500" /> Notification Preferences</h2>
               {[
                 { key: 'criticalAlerts', label: 'Critical Anomaly Alerts', desc: 'Immediate alerts for critical risk detections' },
-                { key: 'dailyDigest', label: 'Daily Digest', desc: 'Summary of daily MPLADS activity' },
+                { key: 'dailyDigest', label: 'Daily Digest', desc: 'Summary of daily Yatharth activity' },
                 { key: 'emailReport', label: 'Email Reports', desc: 'Receive weekly reports via email' },
                 { key: 'smsAlerts', label: 'SMS Alerts', desc: 'Get critical alerts via SMS' },
                 { key: 'browserNotif', label: 'Browser Notifications', desc: 'Desktop push notifications' },

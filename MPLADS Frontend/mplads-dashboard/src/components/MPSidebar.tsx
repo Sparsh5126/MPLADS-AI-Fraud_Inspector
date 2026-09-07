@@ -8,7 +8,7 @@ import {
 
 const navItems = [
   { path: '/mp',                       icon: Home,        label: 'Dashboard' },
-  { path: '/mp/works',                 icon: FileText,    label: 'My MPLADS Works' },
+  { path: '/mp/works',                 icon: FileText,    label: 'My Yatharth Works' },
   { path: '/mp/constituency',          icon: MapPin,      label: 'Constituency Overview' },
   { path: '/mp/districts',             icon: LayoutGrid,  label: 'Districts' },
   { path: '/mp/agencies',              icon: Users,       label: 'Implementing Agencies' },
@@ -40,7 +40,7 @@ export const MPSidebar: React.FC = () => {
             <p className="text-white font-bold text-sm leading-tight tracking-wide">MoSPI</p>
             <p className="text-white/55 text-[9.5px] leading-tight mt-0.5">Ministry of Statistics &</p>
             <p className="text-white/55 text-[9.5px] leading-tight">Programme Implementation</p>
-            <p className="text-white/40 text-[9px] leading-tight mt-1">MPLADS Monitoring Portal</p>
+            <p className="text-white/40 text-[9px] leading-tight mt-1">Yatharth Monitoring Portal</p>
           </div>
         </div>
       </div>

@@ -26,7 +26,7 @@ export const Reports: React.FC = () => {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Generate and export MPLADS audit and analysis reports</p>
+        <p className="text-sm text-gray-500 mt-0.5">Generate and export Yatharth audit and analysis reports</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

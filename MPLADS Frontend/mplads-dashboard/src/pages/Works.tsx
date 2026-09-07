@@ -16,7 +16,7 @@ export const Works: React.FC = () => {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Works</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Browse and filter all MPLADS works</p>
+          <p className="text-sm text-gray-500 mt-0.5">Browse and filter all Yatharth works</p>
         </div>
         <div className="flex flex-wrap items-end gap-2">
           <div>

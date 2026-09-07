@@ -41,7 +41,7 @@ export const DistrictWorks: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900">Works & Projects</h1>
-          <p className="text-sm text-gray-500 mt-0.5">All MPLADS works in Meerut district</p>
+          <p className="text-sm text-gray-500 mt-0.5">All Yatharth works in Meerut district</p>
         </div>
         <button className="flex items-center gap-2 text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors text-gray-700">
           <Download size={15} /> Export

@@ -35,7 +35,7 @@ export const StateSidebar: React.FC = () => {
           </div>
           <div className="min-w-0">
             <p className="text-white font-bold text-sm leading-tight tracking-wide">MoSPI</p>
-            <p className="text-white/60 text-[10px] leading-tight mt-0.5">MPLADS Monitoring Portal</p>
+            <p className="text-white/60 text-[10px] leading-tight mt-0.5">Yatharth Monitoring Portal</p>
           </div>
         </div>
       </div>

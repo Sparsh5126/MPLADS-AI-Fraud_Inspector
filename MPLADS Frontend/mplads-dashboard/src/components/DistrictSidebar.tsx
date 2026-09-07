@@ -36,7 +36,7 @@ export const DistrictSidebar: React.FC = () => {
             <p className="text-white font-bold text-sm leading-tight tracking-wide">MoSPI</p>
             <p className="text-white/55 text-[9.5px] leading-tight mt-0.5">Ministry of Statistics &</p>
             <p className="text-white/55 text-[9.5px] leading-tight">Programme Implementation</p>
-            <p className="text-white/40 text-[9px] leading-tight mt-1">MPLADS Monitoring Portal</p>
+            <p className="text-white/40 text-[9px] leading-tight mt-1">Yatharth Monitoring Portal</p>
           </div>
         </div>
       </div>
